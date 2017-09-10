@@ -29,15 +29,14 @@ def nonlin(x, deriv=False):
         return x * (1 - x)
     return 1 / (1 + np.exp(-x))
 
-
-# Initialise weights for NN
+# Initialise weights for the Network
 np.random.seed(1)
-
 syn0 = 2*np.random.random((15, 10)) - 1
 syn1 = 2*np.random.random((10, 10)) - 1 
                          
-# Some gradient descent settings
-iterations = 1500;
+# Some gradient descent settings & array for plotting results
+iterations = 1500
+PlotErr = np.zeros((iterations))
 
 for iter in range(iterations):
     
@@ -49,14 +48,23 @@ for iter in range(iterations):
     #How bad are we now??
     L2_error = Y - L2
     L1_error = L2 - L1
+    PlotErr[iter] = np.max(abs(L2_error))
+    
     
     # Calculate how much we missed by slope of the sigmoid
-    L2_delta = L2_error * nonlin(L2, True) * 1
+    L2_delta = L2_error * nonlin(L2, True) 
     L1_delta = L1_error * nonlin(L1, True) 
     
-    syn1 += np.dot(L1.T, L2_delta)
+    syn1 += np.dot(L1.T, L2_delta) * 1
     syn0 += np.dot(L0.T, L1_delta) * 0.1
 
-plt.matshow(L2_error)
+plt.plot(PlotErr)
+
+plt.xlabel('number of iterations')
+plt.ylabel('peack errors in output layer')
+plt.title('Differences between the output layer values and subscribed data')
+
 plt.show()
+print('Final error rate after the training process: ')
+print('(according to the training set)')
 print(np.max(L2_error))
