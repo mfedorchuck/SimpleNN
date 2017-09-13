@@ -49,8 +49,7 @@ for iter in range(iterations):
     L2_error = Y - L2
     L1_error = L2 - L1
     PlotErr[iter] = np.max(abs(L2_error))
-    
-    
+      
     # Calculate how much we missed by slope of the sigmoid
     L2_delta = L2_error * nonlin(L2, True) 
     L1_delta = L1_error * nonlin(L1, True) 
@@ -58,13 +57,54 @@ for iter in range(iterations):
     syn1 += np.dot(L1.T, L2_delta) * 1
     syn0 += np.dot(L0.T, L1_delta) * 0.1
 
-plt.plot(PlotErr)
+# Displaying - how performance of network improving with amout of iterations
+#plt.plot(PlotErr)
+#
+#plt.xlabel('number of iterations')
+#plt.ylabel('peack errors in output layer')
+#plt.title('Differences between the output layer values and subscribed data')
+#plt.show()
 
-plt.xlabel('number of iterations')
-plt.ylabel('peack errors in output layer')
-plt.title('Differences between the output layer values and subscribed data')
-
-plt.show()
 print('Final error rate after the training process: ')
 print('(according to the training set)')
 print(np.max(L2_error))
+
+print()
+print("Now 10 new images will be created and classified as numbers...")
+#wait = input("Press Enter...")
+
+np.random.seed(seed = None)
+plt.close('all')
+fig = plt.figure(10)
+
+def classification(InitIm, synap1, synap2):
+    L0 = np.reshape(InitIm[:,:], 15)
+    L1 = nonlin(np.dot(L0, synap1))
+    return nonlin(np.dot(L1, synap2))
+
+def IsValuable(RandIm):
+    if np.max(RandIm) > 0.9:
+        return 1
+    return 0
+
+for index in range(5):
+    
+    IsVal = 0
+    while (IsVal != 1):
+        RandIm = abs(np.ceil(np.random.randn(5, 3) /10))
+        OutPt = classification(RandIm, syn0, syn1)
+        IsVal = IsValuable(OutPt)
+        
+    max_idx = np.argmax(OutPt)
+    max_val = OutPt[max_idx]
+
+    plt.subplot(5, 5, (index*5 + 1))
+    plt.imshow(RandIm, cmap = plt.cm.gray)
+    plt.axis('off') 
+    
+    plt.subplot(5, 5, (index*5 + 2))
+    plt.axis('off')
+    plt.text(0, 0.5, max_idx+1)
+    plt.text(0, 0.1, max_val)
+
+plt.show()
